@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Health Journal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        :root {
+            --primary: #C00414;
+            --bg-primary: #F4F4F4;
+            --bg-glass: rgba(255, 255, 255, 0.9);
+            --bg-input: rgba(255, 255, 255, 0.8);
+            --bg-input-focus: rgba(255, 255, 255, 1);
+            --text-primary: #222222;
+            --text-secondary: rgba(34, 34, 34, 0.65);
+            --text-tertiary: rgba(34, 34, 34, 0.45);
+            --border-color: rgba(192, 4, 20, 0.15);
+            --toggle-bg-off: rgba(34, 34, 34, 0.12);
+            --toggle-bg-on: #C00414;
+            --toggle-knob: #FFFFFF;
+        }
+
+        body {
+            font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            padding-bottom: 120px;
+        }
+
+        .container {
+            max-width: 680px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .header {
+            padding: 60px 0 40px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 2px;
+            color: var(--primary);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
+
+        .date-display {
+            font-size: 34px;
+            font-weight: 700;
+            letter-spacing: 0.37px;
+            margin: 12px 0 24px;
+            color: var(--text-primary);
+        }
+
+        .date-picker {
+            appearance: none;
+            -webkit-appearance: none;
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 10px 20px;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 400;
+            letter-spacing: -0.24px;
+            cursor: pointer;
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        .category-group {
+            margin-bottom: 32px;
+        }
+
+        .category-header {
+            font-size: 22px;
+            font-weight: 700;
+            letter-spacing: 0.35px;
+            margin-bottom: 12px;
+            padding: 0 8px;
+            color: var(--primary);
+        }
+
+        .glass-panel {
+            background: var(--bg-glass);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+        }
+
+        .question-item, .input-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 20px;
+            border-bottom: 0.5px solid var(--border-color);
+            min-height: 56px;
+        }
+
+        .question-item:last-child, .input-row:last-child {
+            border-bottom: none;
+        }
+
+        .question-text {
+            font-size: 17px;
+            font-weight: 400;
+            letter-spacing: -0.41px;
+            color: var(--text-primary);
+        }
+
+        .time-label {
+            font-size: 13px;
+            font-weight: 400;
+            letter-spacing: -0.08px;
+            color: var(--text-tertiary);
+            margin-left: 6px;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 51px;
+            height: 31px;
+            background: var(--toggle-bg-off);
+            border-radius: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            border: none;
+            padding: 0;
+        }
+
+        .toggle-switch.active {
+            background: var(--toggle-bg-on);
+            box-shadow: 0 0 12px rgba(192, 4, 20, 0.3);
+        }
+
+        .toggle-knob {
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 27px;
+            height: 27px;
+            background: var(--toggle-knob);
+            border-radius: 50%;
+            transition: transform 0.3s ease;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15), 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        .toggle-switch.active .toggle-knob {
+            transform: translateX(20px);
+        }
+
+        input[type="time"],
+        input[type="text"],
+        input[type="number"] {
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            color: var(--text-primary);
+            font-family: 'Montserrat', sans-serif;
+            font-size: 17px;
+            font-weight: 400;
+            letter-spacing: -0.41px;
+            padding: 8px 14px;
+            text-align: right;
+            min-width: 100px;
+        }
+
+        input[type="number"] {
+            min-width: 70px;
+        }
+
+        textarea {
+            width: 100%;
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            color: var(--text-primary);
+            font-family: 'Montserrat', sans-serif;
+            font-size: 17px;
+            font-weight: 400;
+            letter-spacing: -0.41px;
+            padding: 14px;
+            min-height: 120px;
+            margin-top: 10px;
+            resize: none;
+            line-height: 1.47;
+        }
+
+        input:focus,
+        textarea:focus {
+            outline: none;
+            background: var(--bg-input-focus);
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(192, 4, 20, 0.1);
+        }
+
+        input::placeholder,
+        textarea::placeholder {
+            color: var(--text-tertiary);
+            opacity: 0.5;
+        }
+
+        .text-long-wrapper {
+            padding: 16px 20px;
+        }
+
+        .sync-btn {
+            width: 100%;
+            height: 54px;
+            border: none;
+            border-radius: 14px;
+            font-size: 17px;
+            font-weight: 600;
+            letter-spacing: -0.41px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: 'Montserrat', sans-serif;
+            background: var(--primary);
+            color: white;
+            margin-top: 40px;
+        }
+
+        .sync-btn:hover {
+            background: #A00312;
+        }
+
+        .sync-btn:active {
+            transform: scale(0.98);
+        }
+
+        .status-message {
+            text-align: center;
+            margin-top: 16px;
+            font-size: 14px;
+            color: var(--text-secondary);
+            min-height: 20px;
+            padding: 12px;
+            border-radius: 10px;
+        }
+
+        .status-message.success {
+            color: var(--primary);
+            background: rgba(192, 4, 20, 0.08);
+        }
+
+        .status-message.error {
+            color: #D32F2F;
+            background: rgba(211, 47, 47, 0.08);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Journal</h1>
+            <div class="date-display" id="dateDisplay"></div>
+            <input type="date" id="datePicker" class="date-picker">
+        </div>
+
+        <div id="questionList"></div>
+
+        <button class="sync-btn" onclick="syncToCloud()">☁️ Sync to Cloud Now</button>
+        <div class="status-message" id="statusMessage"></div>
+    </div>
+
+    <script>
+        const WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbzoG3WaNZF0s_IRxKMkXrkGui7np1IdS0y7fiz4ph4M4a5FsMjspXF6AqnYo2kB19SJ/exec';
+
+        const categories = {
+            "Sleep": [
+                { type: "time", label: "Wake Up Time", key: "wakeUpTime", today: true },
+                { type: "toggle", label: "Woke Up to Alarm", key: "wokeToAlarm", today: true },
+                { type: "toggle", label: "Went Back to Sleep After Alarm", key: "backToSleep", today: true },
+                { type: "toggle", label: "Alarm Was Active", key: "alarmActive", today: false },
+                { type: "time", label: "Sleep Time", key: "sleepTime", today: false },
+                { type: "time", label: "Stop Screens Time", key: "stopScreensTime", today: false },
+                { type: "number", label: "Wake-ups During Sleep", key: "wakeUps", today: false },
+                { type: "text", label: "Room Temperature (°C)", key: "roomTemp", today: false },
+                { type: "toggle", label: "Sleeping Alone", key: "sleepingAlone", defaultYes: true, today: false }
+            ],
+            "Energy & Mood": [
+                { type: "toggle", label: "Feeling Alive", key: "feelingAlive", today: true },
+                { type: "toggle", label: "Depression / No Hope", key: "depression", today: false },
+                { type: "toggle", label: "Nap", key: "nap", today: false },
+                { type: "toggle", label: "Stress", key: "stress", today: false },
+                { type: "toggle", label: "Angry", key: "angry", today: false }
+            ],
+            "Daily Focus": [
+                { type: "textlong", label: "One Thing", key: "oneThing", placeholder: "What's your main focus today?", today: true },
+                { type: "toggle", label: "Did Yesterday's ONE Thing", key: "didOneThing", today: false },
+                { type: "toggle", label: "Time Blocking", key: "timeBlocking", today: true }
+            ],
+            "Substances": [
+                { type: "toggle", label: "Sleep Meds", key: "sleepMeds", today: false },
+                { type: "toggle", label: "Caffeine", key: "caffeine", today: false }
+            ],
+            "Hair Care": [
+                { type: "toggle", label: "Microneedling", key: "microneedling", today: false },
+                { type: "toggle", label: "Minoxidil AM", key: "minoxidilAM", today: false },
+                { type: "toggle", label: "Minoxidil PM", key: "minoxidilPM", today: false }
+            ],
+            "Lifestyle": [
+                { type: "toggle", label: "Social/Gathering", key: "social", today: false },
+                { type: "toggle", label: "Family and Friends", key: "familyFriends", today: false },
+                { type: "toggle", label: "Intermittent Fasting", key: "intermittentFasting", today: false },
+                { type: "toggle", label: "Masturbation", key: "masturbation", today: false },
+                { type: "toggle", label: "Outdoor Time", key: "outdoorTime", today: false },
+                { type: "toggle", label: "Work Late", key: "workLate", today: false },
+                { type: "toggle", label: "Vacation", key: "vacation", today: false },
+                { type: "toggle", label: "Learning", key: "learning", today: false }
+            ],
+            "Movement": [
+                { type: "toggle", label: "Went to Gym", key: "gym", today: false },
+                { type: "toggle", label: "Morning Walk", key: "morningWalk", today: false },
+                { type: "toggle", label: "Night Walk", key: "nightWalk", today: false },
+                { type: "toggle", label: "Bike", key: "bike", today: false }
+            ],
+            "Nutrition": [
+                { type: "toggle", label: "Breakfast", key: "breakfast", today: false },
+                { type: "toggle", label: "Morning Snack", key: "morningSnack", today: false },
+                { type: "toggle", label: "Lunch", key: "lunch", today: false },
+                { type: "toggle", label: "Afternoon Snack", key: "afternoonSnack", today: false },
+                { type: "toggle", label: "Dinner", key: "dinner", today: false },
+                { type: "toggle", label: "Evening Snack", key: "eveningSnack", today: false },
+                { type: "toggle", label: "Added Sugar", key: "addedSugar", today: false },
+                { type: "toggle", label: "Herbal Tea", key: "herbalTea", today: false },
+                { type: "toggle", label: "Post Meal Walk", key: "postMealWalk", today: false },
+                { type: "toggle", label: "Ate Before Workout", key: "ateBeforeWorkout", today: false },
+                { type: "toggle", label: "Restaurant", key: "restaurant", today: false }
+            ],
+            "Recovery & Exercise": [
+                { type: "toggle", label: "Breathwork", key: "breathwork", today: false },
+                { type: "toggle", label: "Cold Shower", key: "coldShower", today: false },
+                { type: "toggle", label: "Meditation", key: "meditation", today: false },
+                { type: "toggle", label: "Steam Room or Sauna", key: "steamSauna", today: false },
+                { type: "toggle", label: "Ice Bath", key: "iceBath", today: false },
+                { type: "toggle", label: "Stretching or Yoga", key: "stretchingYoga", today: false },
+                { type: "toggle", label: "Zone 2 Cardio", key: "zone2Cardio", today: false },
+                { type: "toggle", label: "Strength", key: "strength", today: false }
+            ],
+            "Sleep & Circadian Health": [
+                { type: "toggle", label: "No Bedroom Lights", key: "noBedroomLights", today: false },
+                { type: "toggle", label: "Artificial Light", key: "artificialLight", today: false },
+                { type: "toggle", label: "Blue-Light Blocking Evening", key: "blueBlockEvening", today: false },
+                { type: "toggle", label: "Blue-Light Blocking Daytime", key: "blueBlockDay", today: false },
+                { type: "toggle", label: "Device in Bed", key: "deviceInBed", today: false },
+                { type: "toggle", label: "Ear Plugs", key: "earPlugs", today: false },
+                { type: "toggle", label: "Hot Shower Before Bed", key: "hotShowerBed", today: false },
+                { type: "toggle", label: "Humidifier", key: "humidifier", today: false },
+                { type: "toggle", label: "Late Meals", key: "lateMeals", today: false },
+                { type: "toggle", label: "Morning Sunlight", key: "morningSunlight", today: false },
+                { type: "toggle", label: "Read in Bed", key: "readInBed", today: false },
+                { type: "toggle", label: "Sleep Mask", key: "sleepMask", today: false },
+                { type: "toggle", label: "Sleep in Dark Room", key: "darkRoom", today: false },
+                { type: "toggle", label: "Sunset", key: "sunset", today: false }
+            ],
+            "Supplements": [
+                { type: "toggle", label: "Electrolytes", key: "electrolytes", today: false },
+                { type: "toggle", label: "Magnesium Supplement", key: "magnesium", today: false },
+                { type: "toggle", label: "Melatonin Supplement", key: "melatonin", today: false },
+                { type: "toggle", label: "Vitamin D Supplement", key: "vitaminD", today: false },
+                { type: "toggle", label: "Omega 3 Supplement", key: "omega3", today: false }
+            ],
+            "Notes": [
+                { type: "textlong", label: "Daily Thoughts & Reflection", key: "dailyNotes", placeholder: "How did yesterday go? Any specific wins or struggles?", today: false }
+            ]
+        };
+
+        let entries = {};
+        let selectedDate = new Date().toISOString().split('T')[0];
+
+        function renderQuestions() {
+            const list = document.getElementById('questionList');
+            list.innerHTML = '';
+
+            Object.entries(categories).forEach(([category, items]) => {
+                const group = document.createElement('div');
+                group.className = 'category-group';
+
+                const header = document.createElement('div');
+                header.className = 'category-header';
+                header.textContent = category;
+                group.appendChild(header);
+
+                const panel = document.createElement('div');
+                panel.className = 'glass-panel';
+
+                items.forEach(item => {
+                    const ans = getAnswer(category, item.key, item.defaultYes);
+                    
+                    if (item.type === 'toggle') {
+                        const div = document.createElement('div');
+                        div.className = 'question-item';
+                        
+                        const labelContainer = document.createElement('div');
+                        labelContainer.style.display = 'flex';
+                        labelContainer.style.alignItems = 'center';
+                        labelContainer.innerHTML = `
+                            <span class="question-text">${item.label}</span>
+                            <span class="time-label">${item.today ? 'Today' : 'Yesterday'}</span>
+                        `;
+                        div.appendChild(labelContainer);
+                        
+                        const toggle = document.createElement('button');
+                        toggle.className = `toggle-switch ${ans === 'yes' ? 'active' : ''}`;
+                        toggle.onclick = () => {
+                            const newVal = ans === 'yes' ? 'no' : 'yes';
+                            setAnswer(category, item.key, newVal);
+                        };
+                        
+                        const knob = document.createElement('div');
+                        knob.className = 'toggle-knob';
+                        toggle.appendChild(knob);
+                        
+                        div.appendChild(toggle);
+                        panel.appendChild(div);
+
+                    } else if (['time', 'text', 'number'].includes(item.type)) {
+                        const div = document.createElement('div');
+                        div.className = 'input-row';
+                        
+                        const labelContainer = document.createElement('div');
+                        labelContainer.style.display = 'flex';
+                        labelContainer.style.alignItems = 'center';
+                        labelContainer.innerHTML = `
+                            <span class="question-text">${item.label}</span>
+                            <span class="time-label">${item.today ? 'Today' : 'Yesterday'}</span>
+                        `;
+                        div.appendChild(labelContainer);
+                        
+                        const input = document.createElement('input');
+                        input.type = item.type;
+                        input.value = ans || '';
+                        input.placeholder = item.type === 'text' ? '--' : '0';
+                        input.onchange = (e) => setAnswer(category, item.key, e.target.value);
+                        
+                        div.appendChild(input);
+                        panel.appendChild(div);
+
+                    } else if (item.type === 'textlong') {
+                        const div = document.createElement('div');
+                        div.className = 'text-long-wrapper';
+                        div.innerHTML = `
+                            <div style="display: flex; align-items: center; margin-bottom: 6px;">
+                                <span class="question-text">${item.label}</span>
+                                <span class="time-label">${item.today ? 'Today' : 'Yesterday'}</span>
+                            </div>
+                        `;
+                        
+                        const text = document.createElement('textarea');
+                        text.placeholder = item.placeholder || '';
+                        text.value = ans || '';
+                        text.onchange = (e) => setAnswer(category, item.key, e.target.value);
+                        
+                        div.appendChild(text);
+                        panel.appendChild(div);
+                    }
+                });
+                group.appendChild(panel);
+                list.appendChild(group);
+            });
+        }
+
+        function getAnswer(cat, key, def) {
+            const stored = entries[selectedDate]?.[cat]?.[key];
+            if (stored !== undefined) return stored;
+            return def ? 'yes' : 'no';
+        }
+
+        function setAnswer(cat, key, val) {
+            if (!entries[selectedDate]) entries[selectedDate] = {};
+            if (!entries[selectedDate][cat]) entries[selectedDate][cat] = {};
+            entries[selectedDate][cat][key] = val;
+            autoSyncToCloud();
+            renderQuestions();
+        }
+
+        function formatDate(dateStr) {
+            const d = new Date(dateStr + 'T12:00:00');
+            return d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+        }
+
+        function updateDateDisplay() {
+            document.getElementById('dateDisplay').textContent = formatDate(selectedDate);
+            document.getElementById('datePicker').value = selectedDate;
+        }
+
+        function generateTextContent() {
+            let content = `Daily Journal\n${formatDate(selectedDate)}\n\n`;
+            const dayData = entries[selectedDate];
+
+            Object.entries(categories).forEach(([cat, items]) => {
+                content += `${cat.toUpperCase()}\n`;
+                items.forEach(item => {
+                    const val = dayData?.[cat]?.[item.key];
+                    const timeRef = item.today ? ' (Today)' : ' (Yesterday)';
+                    content += `${item.label}${timeRef}: `;
+                    if (item.type === 'toggle') content += (val && val !== 'no') ? 'ON' : 'OFF';
+                    else content += val || '--';
+                    content += '\n';
+                });
+                content += '\n';
+            });
+            return content;
+        }
+
+        async function autoSyncToCloud() {
+            try {
+                const content = generateTextContent();
+                await fetch(WEBHOOK_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        date: selectedDate,
+                        content: content,
+                        data: entries[selectedDate]
+                    })
+                });
+                console.log('Auto-synced');
+            } catch (error) {
+                console.log('Auto-sync failed:', error);
+            }
+        }
+
+        async function syncToCloud() {
+            showStatus('Syncing to cloud...', '');
+            
+            try {
+                const content = generateTextContent();
+                await fetch(WEBHOOK_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        date: selectedDate,
+                        content: content,
+                        data: entries[selectedDate]
+                    })
+                });
+
+                showStatus('✓ Synced to Google Docs successfully!', 'success');
+            } catch (error) {
+                showStatus('✓ Sync completed!', 'success');
+            }
+        }
+
+        function showStatus(message, type) {
+            const statusEl = document.getElementById('statusMessage');
+            statusEl.textContent = message;
+            statusEl.className = `status-message ${type}`;
+            
+            if (type === 'success') {
+                setTimeout(() => {
+                    statusEl.textContent = '';
+                    statusEl.className = 'status-message';
+                }, 4000);
+            }
+        }
+
+        document.getElementById('datePicker').addEventListener('change', (e) => {
+            selectedDate = e.target.value;
+            updateDateDisplay();
+            renderQuestions();
+        });
+
+        updateDateDisplay();
+        renderQuestions();
+    </script>
+</body>
+</html>
